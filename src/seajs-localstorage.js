@@ -27,7 +27,7 @@
     function latestSource(uri) {
         // 检测本地缓存是否最新
         var curVersion = uri.match(/\d\.\d\.\d/);
-        if(curVersion.length){
+        if(curVersion && curVersion.length){
             curVersion = curVersion[0];
             var lastVersion = getLastVersion();
             if(lastVersion && lastVersion != curVersion){
