@@ -7,8 +7,14 @@
     }
 
     function save(uri, dataUri) {
+        //防止重复保存
+        var d = localStorage.getItem('seajscache<' + uri + '>');
+        if(d && d.length > 0) {
+            return false;
+        }
         dataUri = dataUri.toString();
-        localStorage.setItem('seajscache<' + uri + '>', encodeURI('data:text/javascript,define(' + dataUri + ');'));
+        localStorage.setItem('seajscache<' + uri + '>', encodeURI('data:text/javascript;charset=utf-8,define(' + dataUri + ');'));
+        return true;
     }
 
     function load(uri) {
@@ -44,10 +50,11 @@
 
     var oldRequest = seajs.request;
     seajs.request = function (url, callback, charset) {
+
         if(!/\.css(?:\?|$)/i.test(url)) {
             var cacheUri = latestSource(url);
             if(cacheUri && cacheUri.length > 0) {
-                url = cacheUri;
+                url = decodeURI(cacheUri);
             }
         }
         return oldRequest.apply(this, Array.prototype.slice.call(arguments));
@@ -62,7 +69,7 @@
         }
         
         if(enable && this.uri && this.factory && !/\.css(?:\?|$)/i.test(this.uri)) {
-            save(this.uri, this.factory.toString()/*.replace(/\r/, '').replace(/\n/, '')*/);
+            save(this.uri, this.factory.toString().replace(/\r/, '').replace(/\n/, ''));
         }
         return oldExec.apply(this, Array.prototype.slice.call(arguments));
     }
