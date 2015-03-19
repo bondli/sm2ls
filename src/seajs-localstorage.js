@@ -1,10 +1,12 @@
 (function () {
 
     //是否线上模式
-    var isEnable = ~window.location.hostname.indexOf('h5.m.') ? true : false;
+    var isOnline = ~window.location.hostname.indexOf('h5.m.') ? true : false;
 
     //是否日常环境，日常环境是去缓存化的
     var isDaily = ~window.location.hostname.indexOf('waptest.tao') ? true : false;
+
+    var isEnable = isOnline;
 
     //当前的页面URL
     var curHref = window.location.href;
@@ -153,8 +155,8 @@
             if(cacheUri && cacheUri.length > 0) {
                 url = decodeURI(cacheUri);
             }
-            //daily环境去缓存化
-            if(isDaily && window.enableSM2LS == false){
+            //daily环境(或者不是线上的禁用LS时)去缓存化
+            if(isDaily || (!isOnline && window.enableSM2LS == false)){
                 url += '?t='+ (new Date().getTime());
             }
         }
