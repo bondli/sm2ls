@@ -3,6 +3,9 @@
     //是否线上模式
     var isEnable = ~window.location.hostname.indexOf('h5.m.') ? true : false;
 
+    //是否日常环境，日常环境是去缓存化的
+    var isDaily = ~window.location.hostname.indexOf('waptest.tao') ? true : false;
+
     //当前的页面URL
     var curHref = window.location.href;
     var curPage = curHref;
@@ -64,12 +67,19 @@
      * @return {[type]}     [description]
      */
     function load(uri) {
-        var dataUri = localStorage.getItem('seajsmodule<' + uri + '>');
-        if(dataUri && dataUri.length > 0) {
-            return dataUri;
-        } else {
-            return uri;
+        if( typeof(window.enableSM2LS) != 'undefined' ){
+            isEnable = window.enableSM2LS;
         }
+        if(isEnable){
+            var dataUri = localStorage.getItem('seajsmodule<' + uri + '>');
+            if(dataUri && dataUri.length > 0) {
+                return dataUri;
+            } else {
+                return uri;
+            }
+        }
+        return uri;
+
     }
 
     /**
@@ -142,6 +152,10 @@
             var cacheUri = latestSource(url);
             if(cacheUri && cacheUri.length > 0) {
                 url = decodeURI(cacheUri);
+            }
+            //daily环境去缓存化
+            if(isDaily && window.enableSM2LS == false){
+                url += '?t='+ (new Date().getTime());
             }
         }
         return oldRequest.apply(this, Array.prototype.slice.call(arguments));
