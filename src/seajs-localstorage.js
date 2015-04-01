@@ -153,7 +153,7 @@
         if(!/\.css(?:\?|$)/i.test(url)) {
             var cacheUri = latestSource(url);
             if(cacheUri && cacheUri.length > 0) {
-                url = decodeURI(cacheUri);
+                url = cacheUri;
             }
             //daily环境(或者不是线上的禁用LS时)去缓存化
             if(isDaily || (!isOnline && window.enableSM2LS == false)){
