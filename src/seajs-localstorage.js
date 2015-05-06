@@ -46,6 +46,8 @@
         //防止重复保存
         var d = localStorage.getItem('seajsmodule<' + uri + '>');
         if(d && d.length > 0) {
+            //使用次数加1
+            isUpdated && updateModuleUsed(uri, 1);
             return false;
         }
 
@@ -55,12 +57,44 @@
                 'seajsmodule<' + uri + '>',
                 encodeURI('data:text/javascript;charset=utf-8,define(' + dataUri + ');')
             );
+
+            //使用次数置为1
+            updateModuleUsed(uri, 0);
+
             return true;
         }
         catch(oException){
             //存储失败了就清除所有的
             localStorage.clear();
         }
+    }
+
+    /**
+     * 更新模块被使用的次数
+     * @param  {[type]}  uri   [description]
+     * @param  {Boolean} addNums [description]
+     * @return {[type]}        [description]
+     */
+    function updateModuleUsed(uri, addNums) {
+        var key = 'seajsmused<'+ uri + '>';
+
+        if(addNums === 0){ //初始化
+            localStorage.setItem(key, 1);
+        }
+        else{
+            var v = localStorage.getItem(key);
+            if(v){
+                v = parseInt(v, 10) + addNums;
+                if(v === 0){ //使用次数为0时删除
+                    localStorage.removeItem(key);
+                    localStorage.removeItem('seajsmodule<'+ uri + '>');
+                }
+                else {
+                    localStorage.setItem(key, v);
+                }
+            }
+        }
+
     }
 
     /**
@@ -90,10 +124,11 @@
      * @return {[type]}     [description]
      */
     function del(uri) {
-        //如果版本更新了，需要删除原来的缓存
+        //如果版本更新了，需要删除原来的缓存,这里只做使用次数的更新即可
         if( isUpdated ) {
             var lastKey = uri.replace(curVersion, lastVersion);
-            localStorage.removeItem('seajsmodule<' + lastKey + '>');
+            //localStorage.removeItem('seajsmodule<' + lastKey + '>');
+            updateModuleUsed(lastKey, -1);
         }
     }
 
@@ -126,7 +161,7 @@
     function latestSource(uri) {
         //没有检查就做一次检查
         if( !isChecked ){
-            var cv = uri.match(/\d\.\d\.\d/);
+            var cv = uri.match(/\d+\.\d+\.\d+/);
             if(cv && cv.length){
                 curVersion = cv[0];
 
@@ -158,6 +193,10 @@
             //daily环境(或者不是线上的禁用LS时)去缓存化
             if(isDaily || (!isOnline && window.enableSM2LS == false)){
                 url += '?t='+ (new Date().getTime());
+            }
+            //daily环境也可以启用缓存，用于刷新页面debugJS
+            if(isDaily && window.enableCache === true){
+                url = cacheUri;
             }
         }
         return oldRequest.apply(this, Array.prototype.slice.call(arguments));

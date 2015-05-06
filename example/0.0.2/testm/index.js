@@ -1,6 +1,7 @@
 define("testm/index", [ "bower_components/admix-ui/build/console/console" ], function(require, exports, module) {
     var console = require("bower_components/admix-ui/build/console/console");
 
+    document.body.innerHTML = 'test m 0.0.2';
     console.log('test m');
 
 });
