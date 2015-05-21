@@ -1,10 +1,24 @@
 (function () {
 
+    var onlineDomain = ['m.tao','miaostreet.com'];
+    var dailyDomain = ['waptest.tao','daily.tao'];
+    var host = window.location.hostname;
+
     //是否线上模式
-    var isOnline = ~window.location.hostname.indexOf('h5.m.') ? true : false;
+    var isOnline = false;
+    for(var i in onlineDomain) {
+        if(~host.indexOf(onlineDomain[i])){
+            isOnline = true;
+        }
+    }
 
     //是否日常环境，日常环境是去缓存化的
-    var isDaily = ~window.location.hostname.indexOf('waptest.tao') ? true : false;
+    var isDaily = false;
+    for(var i in dailyDomain) {
+        if(~host.indexOf(dailyDomain[i])){
+            isDaily = true;
+        }
+    }
 
     var isEnable = isOnline;
 
