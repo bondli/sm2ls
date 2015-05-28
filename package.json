@@ -1,6 +1,6 @@
 {
   "name": "sm2ls",
-  "version": "0.0.0",
+  "version": "0.0.3",
   "dependencies": {},
   "devDependencies": {
     "grunt": "^0.4.1",
